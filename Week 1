@@ -1,0 +1,59 @@
+from collections import deque
+
+class Position:
+    def __init__(self, x, y, traversable=True):
+        self.x = x
+        self.y = y
+        self.traversable = traversable
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
+    def __hash__(self):
+        return hash((self.x, self.y))
+
+class Map:
+    def __init__(self, grid):
+        self.rows = len(grid)
+        self.cols = len(grid[0]) if self.rows > 0 else 0
+        self.grid = [[Position(i, j, grid[i][j]) for j in range(self.cols)] for i in range(self.rows)]
+
+    def is_valid(self, x, y):
+        return 0 <= x < self.rows and 0 <= y < self.cols and self.grid[x][y].traversable
+
+    def get_position(self, x, y):
+        return self.grid[x][y]
+
+class Rover:
+    def __init__(self, start_pos):
+        self.battery = 100
+        self.current_position = start_pos
+
+    def traverse(self, map_obj, target_pos):
+        visited = set()
+        queue = deque()
+        queue.append((self.current_position.x, self.current_position.y, 0))  # (x, y, steps)
+
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+        while queue:
+            x, y, steps = queue.popleft()
+
+            if (x, y) in visited:
+                continue
+            visited.add((x, y))
+
+            if x == target_pos.x and y == target_pos.y:
+                if steps <= self.battery:
+                    self.battery -= steps
+                    self.current_position = Position(x, y)
+                    return steps
+                else:
+                    return -1
+
+            for dx, dy in directions:
+                nx, ny = x + dx, y + dy
+                if map_obj.is_valid(nx, ny) and (nx, ny) not in visited:
+                    queue.append((nx, ny, steps + 1))
+
+        return -1  # No path found
