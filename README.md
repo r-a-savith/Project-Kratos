@@ -5,7 +5,7 @@ Position: Represents coordinates and traversability.
 Map: A 2D grid composed of Position objects.
 Rover: Simulates rover movement and battery usage.
 
-🧱 Class Descriptions
+Class Descriptions
 class Position
 Represents a location on the map.
 
